@@ -5,10 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-        crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+        crossorigin="anonymous">
     <title>Survey</title>
 </head>
 
@@ -189,29 +191,77 @@
             |
             <a href="https://github.com/alijan312/FriendFinder">GitHub Repo</a>
         </footer>
+
+        <div class="modal" id='modalWindow' tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <script type="text/javascript">
             $('#submit').on('click', function () {
                 event.preventDefault();
 
-                const newProfile = {
-                    name: $('#name').val().trim(),
-                    photo: $('#photo').val().trim(),
-                    scores: [
-                        $('#q1').val(),
-                        $('#q2').val(),
-                        $('#q3').val(),
-                        $('#q4').val(),
-                        $('#q5').val(),
-                        $('#q6').val(),
-                        $('#q7').val(),
-                        $('#q8').val(),
-                        $('#q9').val(),
-                        $('#q10').val(),
-                    ]
-                };
-                $.post('/api/friends', newProfile, function(data){
+                function validate() {
+                    let valid = true;
+                    $('.form-control').each(function () {
+                        if ($(this).val() === '') {
+                            valid = false;
+                        }
+                    });
+                    $('.choices').each(function () {
+                        if ($(this).val() === '') {
+                            valid = false;
+                        }
+                    });
+                    return valid;
+                }
 
-                });
+                if (validate()) {
+                    const newProfile = {
+                        name: $('#name').val().trim(),
+                        photo: $('#photo').val().trim(),
+                        scores: [
+                            $('#q1').val(),
+                            $('#q2').val(),
+                            $('#q3').val(),
+                            $('#q4').val(),
+                            $('#q5').val(),
+                            $('#q6').val(),
+                            $('#q7').val(),
+                            $('#q8').val(),
+                            $('#q9').val(),
+                            $('#q10').val(),
+                        ]
+                    };
+                    $.post(window.location.origin + '/api/friends', newProfile, function (data) {});
+                    $.ajax({
+                        url: window.location.origin + '/api/friends',
+                        method: 'GET'
+                    }).done(function (res) {
+                        $('.modal-title').append('Your Match');
+                        $('#modalWindow').modal();
+                        $('.modal-body').html('<h5>' + bestMatch.name + '<h5/>');
+                        $('.modal-body').html('<img width="200px" src=' + bestMatch.photo + '>');
+                    });
+
+
+
+                } else {
+                    $('#modalWindow').modal();
+                    $('.modal-body').html('<h4>Please fill out all the fields</h4>');
+                }
             });
         </script>
 </body>
